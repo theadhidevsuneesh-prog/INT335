@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cabin Micro-Slot System</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-view="student">
+
+<header class="app-header">
+  <div class="brand">
+    <strong>Cabin Micro-Slot System</strong>
+    <span>P09 &middot; Heard in Class, Lost After &middot; LPU</span>
+  </div>
+  <nav class="tabs" aria-label="Switch screen">
+    <button type="button" class="tab" data-action="view" data-view="student">Student</button>
+    <button type="button" class="tab" data-action="view" data-view="door">Door display</button>
+    <button type="button" class="tab" data-action="view" data-view="faculty">Faculty</button>
+    <button type="button" class="tab tab-all" data-action="view" data-view="all">All screens</button>
+  </nav>
+</header>
+
+<div id="storage-warning" class="alert alert-warn banner" hidden role="status">
+  Browser storage is unavailable, so the queue will be lost on reload.
+</div>
+
+<main class="layout">
+
+  <!-- ============ 2. STUDENT REMOTE PORTAL ============ -->
+  <section class="pane" id="pane-student" aria-labelledby="h-student">
+    <div class="pane-inner">
+      <h2 id="h-student">Student portal <small>Hostel view</small></h2>
+
+      <div class="card">
+        <label for="faculty-select">Faculty &amp; cabin</label>
+        <select id="faculty-select"></select>
+        <div id="directory" class="directory" aria-live="polite"></div>
+      </div>
+
+      <div id="slip" aria-live="polite"></div>
+
+      <form id="book-form" class="card" novalidate autocomplete="off">
+        <h3>Book a micro-slot</h3>
+
+        <label for="stu-name">Student name</label>
+        <input id="stu-name" name="name" type="text" maxlength="60" placeholder="e.g. Karan Singh" required>
+
+        <label for="stu-reg">Registration number</label>
+        <input id="stu-reg" name="reg" type="text" inputmode="numeric" maxlength="8" placeholder="8 digits, e.g. 12302317" required>
+
+        <label for="stu-hostel">Staying in</label>
+        <select id="stu-hostel" name="hostel"></select>
+
+        <label for="stu-topic">Specific doubt / derivation step</label>
+        <textarea id="stu-topic" name="topic" rows="2" maxlength="140" placeholder="e.g. Step 2 in asymptotic proof / CA2 rubric" required></textarea>
+
+        <div id="book-hint" class="alert alert-warn" hidden role="status"></div>
+        <div id="book-error" class="alert alert-error" hidden role="alert"></div>
+
+        <button type="submit" id="book-btn" class="btn btn-primary btn-block">Book 5-Minute Micro-Slot</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ============ 1. OUTSIDE CABIN DOOR DISPLAY ============ -->
+  <section class="pane" id="pane-door" aria-labelledby="h-door">
+    <div class="door-card">
+      <div class="door-top">
+        <div>
+          <h2 id="h-door" class="door-cabin"></h2>
+          <div id="door-faculty" class="door-faculty"></div>
+        </div>
+        <button type="button" class="btn btn-dark" data-action="fullscreen">Fullscreen</button>
+      </div>
+
+      <div id="door-pill" class="door-pill" role="status"></div>
+      <div id="door-lock" class="door-lock" hidden>DOOR LOCKED &middot; PLEASE DO NOT KNOCK</div>
+
+      <div class="door-main">
+        <div class="door-label">NOW SERVING</div>
+        <div id="door-token" class="door-token">--</div>
+        <div id="door-topic" class="door-topic"></div>
+        <div id="door-reg" class="door-reg"></div>
+        <div id="door-timer" class="door-timer"></div>
+      </div>
+
+      <div class="door-queue">
+        <div><span id="door-waiting" class="door-count">0</span> waiting in line</div>
+        <div id="door-next" class="door-next"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. FACULTY CONSOLE ============ -->
+  <section class="pane" id="pane-faculty" aria-labelledby="h-faculty">
+    <div class="pane-inner">
+      <h2 id="h-faculty">Faculty console <small>Desk view</small></h2>
+
+      <div class="card">
+        <label for="fac-select">Signed in as</label>
+        <select id="fac-select"></select>
+
+        <div class="label-like">Door status</div>
+        <div class="seg" role="group" aria-label="Door status">
+          <button type="button" class="seg-btn seg-ok" data-action="status" data-status="open">Open (Doubts)</button>
+          <button type="button" class="seg-btn seg-warn" data-action="status" data-status="busy">Busy (Grading CA Papers)</button>
+          <button type="button" class="seg-btn seg-bad" data-action="status" data-status="away">Away (In Lecture)</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>In the cabin</h3>
+        <div id="fac-current" class="fac-current" aria-live="polite"></div>
+
+        <div class="actions">
+          <button type="button" id="btn-next" class="btn btn-primary" data-action="call-next">Call Next Student &#10132;</button>
+          <button type="button" id="btn-noshow" class="btn btn-danger" data-action="no-show">Mark No-Show / Skip</button>
+          <button type="button" id="btn-extend" class="btn" data-action="extend">Add 5 Mins Extension</button>
+          <button type="button" id="btn-complete" class="btn" data-action="complete">Complete visit</button>
+        </div>
+        <div id="fac-hint" class="hint" role="status"></div>
+        <div id="fac-alert" class="alert alert-error" hidden role="alert"></div>
+
+        <h3 class="sub">Waiting (<span id="fac-waiting-count">0</span>)</h3>
+        <ol id="fac-waiting" class="waiting-list"></ol>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Student visit history</h3>
+          <button type="button" id="btn-export" class="btn btn-sm" data-action="export">Export Attendance / Visit Log (CSV)</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Token</th><th>Reg No</th><th>Name</th><th>Doubt topic</th><th>Time in</th><th>Duration</th><th>Outcome</th></tr>
+            </thead>
+            <tbody id="history-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  Data is stored in this browser (localStorage) and syncs between tabs.
+  <button type="button" class="link-btn" data-action="reset">Reset demo data</button>
+</footer>
+
+<script src="js/store.js"></script>
+<script src="js/render.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
